@@ -1,101 +1,160 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petición de Vacantes</title>
-    <style>
-        body { font-family: system-ui; background: #121212; color: #fff; max-width: 500px; margin: 2rem auto; padding: 1rem; }
-        input, select, button { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #1e1e1e; color: #fff; box-sizing: border-box; }
-        button { background: #6f42c1; font-weight: bold; cursor: pointer; border: none; }
-        button:hover { background: #59359a; }
-        .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .sec-label { background: #2a2a2a; padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h2>Petición de Apertura de Vacantes</h2>
-    <p style="color: #aaa; font-size: 0.9em;">Ingresa tu código y selecciona el curso donde necesitas vacante</p>
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0" />
+		<title>Petición de Vacantes</title>
+		<style>
+			body {
+				font-family: system-ui;
+				background: #121212;
+				color: #fff;
+				max-width: 500px;
+				margin: 2rem auto;
+				padding: 1rem;
+			}
+			input,
+			select,
+			button {
+				width: 100%;
+				padding: 10px;
+				margin-bottom: 15px;
+				border-radius: 6px;
+				border: 1px solid #333;
+				background: #1e1e1e;
+				color: #fff;
+				box-sizing: border-box;
+			}
+			button {
+				background: #6f42c1;
+				font-weight: bold;
+				cursor: pointer;
+				border: none;
+			}
+			button:hover {
+				background: #59359a;
+			}
+			.section-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+				margin-bottom: 15px;
+			}
+			.sec-label {
+				background: #2a2a2a;
+				padding: 10px;
+				border-radius: 6px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				cursor: pointer;
+			}
+			input[type='checkbox'] {
+				width: auto;
+				margin-bottom: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>Petición de Apertura de Vacantes</h2>
+		<p style="color: #aaa; font-size: 0.9em">
+			Ingresa tu código y selecciona el curso donde necesitas vacante
+		</p>
 
-    <label>Código UNI:</label>
-    <input type="text" id="uniCode" placeholder="Ej. 20210001A" required>
+		<label>Código UNI:</label>
+		<input
+			type="text"
+			id="uniCode"
+			placeholder="Ej. 20210001A"
+			required />
 
-    <label>Curso:</label>
-    <select id="courseSelect" onchange="renderSections()">
-        <option value="">Cargando base de datos...</option>
-    </select>
+		<label>Curso:</label>
+		<select
+			id="courseSelect"
+			onchange="renderSections()">
+			<option value="">Cargando base de datos...</option>
+		</select>
 
-    <label>Secciones Solicitadas:</label>
-    <div id="sectionsContainer" class="section-grid"></div>
+		<label>Secciones Solicitadas:</label>
+		<div
+			id="sectionsContainer"
+			class="section-grid"></div>
 
-    <button onclick="submitPayload()">enviar soli</button>
-    <div id="statusMsg" style="text-align: center; font-weight: bold; margin-top: 10px;"></div>
+		<button onclick="submitPayload()">enviar soli</button>
+		<div
+			id="statusMsg"
+			style="text-align: center; font-weight: bold; margin-top: 10px"></div>
 
-    <script>
-        const SERVER_URL = 'https://devchrisacosta.net//api/request'; // REEMPLAZAR TRAS DEPLOY
-        let db = {};
+		<script>
+			const SERVER_URL = 'https://devchrisacosta.net/api/request'; // REEMPLAZAR TRAS DEPLOY
+			let db = {};
 
-        async function init() {
-            db = await fetch('./database.json').then(r => r.json());
-            const select = document.getElementById('courseSelect');
-            select.innerHTML = '<option value="">Selecciona un curso...</option>';
-            Object.keys(db).forEach(code => {
-                select.innerHTML += `<option value="${code}">${code} - ${db[code].name}</option>`;
-            });
-        }
+			async function init() {
+				db = await fetch('./database.json').then((r) => r.json());
+				const select = document.getElementById('courseSelect');
+				select.innerHTML = '<option value="">Selecciona un curso...</option>';
+				Object.keys(db).forEach((code) => {
+					select.innerHTML += `<option value="${code}">${code} - ${db[code].name}</option>`;
+				});
+			}
 
-        function renderSections() {
-            const code = document.getElementById('courseSelect').value;
-            const container = document.getElementById('sectionsContainer');
-            container.innerHTML = '';
-            if (!code) return;
+			function renderSections() {
+				const code = document.getElementById('courseSelect').value;
+				const container = document.getElementById('sectionsContainer');
+				container.innerHTML = '';
+				if (!code) return;
 
-            Object.keys(db[code].sections).forEach(sec => {
-                container.innerHTML += `
+				Object.keys(db[code].sections).forEach((sec) => {
+					container.innerHTML += `
                     <label class="sec-label">
                         <input type="checkbox" value="${sec}" class="sec-checkbox"> Sec ${sec}
                     </label>
                 `;
-            });
-        }
+				});
+			}
 
-        async function submitPayload() {
-            const uniCode = document.getElementById('uniCode').value.trim();
-            const courseCode = document.getElementById('courseSelect').value;
-            const checkboxes = document.querySelectorAll('.sec-checkbox:checked');
-            const sections = Array.from(checkboxes).map(cb => cb.value);
+			async function submitPayload() {
+				const uniCode = document.getElementById('uniCode').value.trim();
+				const courseCode = document.getElementById('courseSelect').value;
+				const checkboxes = document.querySelectorAll('.sec-checkbox:checked');
+				const sections = Array.from(checkboxes).map((cb) => cb.value);
 
-            if (!uniCode || !courseCode || sections.length === 0) {
-                return showMsg("Completa todos los campos y selecciona al menos una sección", "red");
-            }
+				if (!uniCode || !courseCode || sections.length === 0) {
+					return showMsg(
+						'Completa todos los campos y selecciona al menos una sección',
+						'red',
+					);
+				}
 
-            try {
-                const res = await fetch(SERVER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ uniCode, courseCode, sections })
-                });
-                const json = await res.json();
-                
-                if (res.ok) {
-                    showMsg("Solicitud registrada correctamente.", "#28a745");
-                    document.getElementById('courseSelect').value = '';
-                    renderSections();
-                } else {
-                    showMsg(json.error, "#dc3545");
-                }
-            } catch (e) {
-                showMsg("Error de conexión con el servidor.", "#dc3545");
-            }
-        }
+				try {
+					const res = await fetch(SERVER_URL, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ uniCode, courseCode, sections }),
+					});
+					const json = await res.json();
 
-        function showMsg(text, color) {
-            const el = document.getElementById('statusMsg');
-            el.innerText = text;
-            el.style.color = color;
-        }
+					if (res.ok) {
+						showMsg('Solicitud registrada correctamente.', '#28a745');
+						document.getElementById('courseSelect').value = '';
+						renderSections();
+					} else {
+						showMsg(json.error, '#dc3545');
+					}
+				} catch (e) {
+					showMsg('Error de conexión con el servidor.', '#dc3545');
+				}
+			}
 
-        init();
-    </script>
-</body>
+			function showMsg(text, color) {
+				const el = document.getElementById('statusMsg');
+				el.innerText = text;
+				el.style.color = color;
+			}
+
+			init();
+		</script>
+	</body>
 </html>
